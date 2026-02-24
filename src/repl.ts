@@ -1,10 +1,4 @@
-import { createInterface } from "node:readline";
-import { stdin, stdout } from "node:process";
-import { commandExit } from "./command_exit.js";
-import { CLICommand } from "./command.js";
-import { commandHelp } from "./command_help.js";
-
-
+import { State } from "./state";
 
 export function cleanInput(text: string): string[] {
     const clearText = text.trim();
@@ -14,54 +8,34 @@ export function cleanInput(text: string): string[] {
     return splittedText.filter(text => text.length > 0);
 }
 
-export function getCommands(): Record<string, CLICommand> {
-    return {
-        exit: {
-            name: "exit",
-            description: "Exits the pokedex",
-            callback: commandExit,
-        },
-        help: {
-            name: "help",
-            description: "prints a help message describing how to use the REPL",
-            callback: commandHelp,
-        },
-    };
-}
+export function startREPL(state: State) {
+    state.readline.prompt()
 
-export function startREPL() {
-    const rl = createInterface({
-        input: stdin,
-        output: stdout,
-        prompt: "Pokedex > "
-    });
-
-    rl.prompt()
-
-    rl.on("line", (line) => {
-        const arrWords = cleanInput(line);
+    state.readline.on("line", async (input) => {
+        const arrWords = cleanInput(input);
 
         if (arrWords.length === 0) {
-            rl.prompt();
+            state.readline.prompt();
             return;
         }
 
         const commandName = arrWords[0];
-        const commands = getCommands();
-        const cmd = commands[commandName];
+        const cmd = state.commands[commandName];
 
         if (!cmd) {
-            console.log("Unknown command");
-        }
-        else {
-            try {
-                cmd.callback(commands);
-            }
-            catch (err) {
-                console.log(err);
-            }
+            console.log(`Unknown command: "${commandName}". Type "help" for a list of commands. \n`);
+            state.readline.prompt();
+            return;
         }
 
-        rl.prompt();
+        try {
+            cmd.callback(state);
+        }
+        catch (err) {
+            console.log(err);
+        }
+        
+
+        state.readline.prompt();
     })
 }
