@@ -1,5 +1,10 @@
 import { createInterface } from "node:readline";
 import { stdin, stdout } from "node:process";
+import { commandExit } from "./command_exit.js";
+import { CLICommand } from "./command.js";
+import { commandHelp } from "./command_help.js";
+
+
 
 export function cleanInput(text: string): string[] {
     const clearText = text.trim();
@@ -7,6 +12,21 @@ export function cleanInput(text: string): string[] {
     const splittedText = lowerText.split(" ");
 
     return splittedText.filter(text => text.length > 0);
+}
+
+export function getCommands(): Record<string, CLICommand> {
+    return {
+        exit: {
+            name: "exit",
+            description: "Exits the pokedex",
+            callback: commandExit,
+        },
+        help: {
+            name: "help",
+            description: "prints a help message describing how to use the REPL",
+            callback: commandHelp,
+        },
+    };
 }
 
 export function startREPL() {
@@ -26,7 +46,22 @@ export function startREPL() {
             return;
         }
 
-        console.log(`Your command was: ${arrWords[0]}`);
+        const commandName = arrWords[0];
+        const commands = getCommands();
+        const cmd = commands[commandName];
+
+        if (!cmd) {
+            console.log("Unknown command");
+        }
+        else {
+            try {
+                cmd.callback(commands);
+            }
+            catch (err) {
+                console.log(err);
+            }
+        }
+
         rl.prompt();
     })
 }
