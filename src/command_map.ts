@@ -9,6 +9,7 @@ export async function commandMapForward(state: State) {
     for (const location of locations.results) {
         console.log(location.name)
     }
+    console.log();
 }
 
 export async function commandMapBack(state: State) {
@@ -23,4 +24,5 @@ export async function commandMapBack(state: State) {
     for (const location of locations.results) {
         console.log(location.name);
     }
+    console.log();
 }
