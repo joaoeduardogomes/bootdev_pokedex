@@ -1,5 +1,4 @@
 import type { State } from "./state.js";
-import type { Pokemon } from "./pokeapi.js";
 
 export async function commandCatch(state: State, ...args: string[]): Promise<void> {
     const pokemonName = args[0];
