@@ -28,9 +28,6 @@ function rollDice(maxValue: number) {
 function checkCaught(baseExperience: number): boolean {
     const d20 = rollDice(21);
 
-    console.log(baseExperience);
-    console.log(d20);
-
     if (baseExperience < 100)
         return d20 >= 4;
     if (baseExperience > 100 && baseExperience < 200)
